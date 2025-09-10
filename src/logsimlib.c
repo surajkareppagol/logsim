@@ -28,6 +28,8 @@
 GVC_t *g_graphviz_context = NULL;
 Agraph_t *g_graphviz_graph = NULL;
 
+FILE *g_log_file = NULL;
+
 /*************** Function Definitions ***************/
 
 void logic_graph_init(char *name) {
@@ -48,6 +50,16 @@ void logic_graph_export(char *name) {
   agclose(g_graphviz_graph);
   gvFreeContext(g_graphviz_context);
 }
+
+void logic_utility_init(char *name) {
+  g_log_file = fopen(name, "w");
+
+  fprintf(g_log_file, "+-------------+--------+-------+\n");
+  fprintf(g_log_file, "|   BLOCK     | TYPE   | DATA  |\n");
+  fprintf(g_log_file, "+-------------+--------+-------+\n");
+}
+
+void logic_utility_terminate() { fclose(g_log_file); }
 
 logic_output_block_t *logic_output_block(int logic_blocks) {
   logic_output_block_t *logic_output_block = NULL;
@@ -387,24 +399,38 @@ int logic_console(logic_block_t *logic_block) {
          "| LOGSIM |\n"
          "----------\n\n");
 
-  printf("LOG: LOGICAL BLOCK (%s).\n", logic_block->name);
+  printf("LOG (EVALUATION): LOGICAL BLOCK (%s).\n", logic_block->name);
 
 #if 1
   for (int i = 0; i < logic_inputs; i++) {
     if (logic_block->input_streams[i]->logic_top_block_type == LOGIC_BLOCK) {
-      printf("LOG: Input data found (%d).\n",
-             logic_block->input_streams[i]
-                 ->logic_block->output_streams[0]
-                 ->logic_data->data);
+      int input = logic_block->input_streams[i]
+                      ->logic_block->output_streams[0]
+                      ->logic_data->data;
+
+      printf("LOG (EVALUATION): Input data found (%d).\n", input);
+
+      fprintf(g_log_file, "| %-10s  | INPUT  | %d     |\n", logic_block->name,
+              input);
+
     } else {
-      printf("LOG: Input data found (%d).\n",
-             logic_block->input_streams[i]->logic_data->data);
+      int input = logic_block->input_streams[i]->logic_data->data;
+      printf("LOG (EVALUATION): Input data found (%d).\n", input);
+
+      fprintf(g_log_file, "| %-10s  | INPUT  | %d     |\n", logic_block->name,
+              input);
     }
   }
 #endif
 
-  printf("LOG: Output data found (%d).\n",
-         logic_block->output_streams[0]->logic_data->data);
+  int output = logic_block->output_streams[0]->logic_data->data;
+
+  printf("LOG (EVALUATION): Output data found (%d).\n", output);
+
+  fprintf(g_log_file, "| %-10s  | OUTPUT | %d     |\n", logic_block->name,
+          output);
+
+  fprintf(g_log_file, "+-------------+--------+-------+\n");
 
   return 0;
 }
