@@ -22,7 +22,8 @@
 int main() {
   printf("LOG: Creating the logic block.\n");
 
-  logic_graph_init("two_level_and");
+  logic_graph_init("two_output_two_level");
+  logic_utility_init("two_output_two_level.log");
 
   /*
    * ---|===|
@@ -122,6 +123,7 @@ int main() {
   logic_eval_all_output_blocks(lob);
 
   logic_graph_export("two_output_two_level_and.svg");
+  logic_utility_terminate();
 
   return 0;
 }
