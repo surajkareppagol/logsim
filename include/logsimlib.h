@@ -95,6 +95,18 @@ void logic_graph_init(char *name);
 void logic_graph_export(char *name);
 
 /**
+ * @brief Utility function.
+ *
+ * @param name
+ */
+void logic_utility_init(char *name);
+
+/**
+ * @brief Close all the resources.
+ */
+void logic_utility_terminate();
+
+/**
  * @brief Create logic output block.
  *
  * @param logic_blocks
