@@ -23,6 +23,7 @@ int main() {
   printf("LOG: Creating the logic block.\n");
 
   logic_graph_init("three_level_and");
+  logic_utility_init("three_level_and.log");
 
   /*
    * ---|===|
@@ -121,9 +122,14 @@ int main() {
 
   printf("LOG: Evaluating all blocks .\n");
 
-  logic_eval_all(lb_1, NULL);
+  logic_output_block_t *lob = logic_output_block(1);
+
+  lob->logic_blocks[0] = lb_1;
+
+  logic_eval_all_output_blocks(lob);
 
   logic_graph_export("three_level_and.svg");
+  logic_utility_terminate();
 
   return 0;
 }

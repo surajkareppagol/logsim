@@ -22,6 +22,9 @@
 int main() {
   printf("LOG: Creating the logic block.\n");
 
+  logic_graph_init("and");
+  logic_utility_init("and.log");
+
   /* Create logic block */
   logic_block_t *lb = logic_block(0, 2, 1, "lb");
 
@@ -45,15 +48,17 @@ int main() {
 
   logic_block_data_connect(lb, output);
 
-  printf("LOG: Evaluating logic block.\n");
-
   /* Evaluate */
-  logic_eval_single_block(lb);
+  printf("LOG: Evaluating all blocks .\n");
 
-  printf("LOG: Printing the data.\n");
+  logic_output_block_t *lob = logic_output_block(1);
 
-  /* Print the result */
-  logic_console(lb);
+  lob->logic_blocks[0] = lb;
+
+  logic_eval_all_output_blocks(lob);
+
+  logic_graph_export("and.svg");
+  logic_utility_terminate();
 
   return 0;
 }
