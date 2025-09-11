@@ -72,9 +72,9 @@ void logic_utility_init(char *name) {
 
   g_log_file = fopen(log_path, "w");
 
-  fprintf(g_log_file, "+-------------+--------+-------+\n");
-  fprintf(g_log_file, "|   BLOCK     | TYPE   | DATA  |\n");
-  fprintf(g_log_file, "+-------------+--------+-------+\n");
+  fprintf(g_log_file, "+-----------------+--------+-------+\n");
+  fprintf(g_log_file, "|   BLOCK         | TYPE   | DATA  |\n");
+  fprintf(g_log_file, "+-----------------+--------+-------+\n");
 }
 
 void logic_utility_terminate() { fclose(g_log_file); }
@@ -93,12 +93,13 @@ logic_output_block_t *logic_output_block(int logic_blocks) {
 }
 
 logic_block_t *logic_block(logic_block_type_t logic_block_type, int inputs,
-                           int outputs, char *name) {
+                           int outputs, char *name, char *prefix) {
   logic_block_t *logic_block = NULL;
 
   logic_block = calloc(1, sizeof(logic_block_t));
 
   logic_block->name = name;
+  logic_block->prefix = prefix;
   logic_block->logic_block_type = logic_block_type;
   logic_block->inputs = inputs;
   logic_block->outputs = outputs;
@@ -444,14 +445,16 @@ int logic_console(logic_block_t *logic_block) {
 
       printf("LOG (EVALUATION): Input data found (%d).\n", input);
 
-      fprintf(g_log_file, "| %-10s  | INPUT  | %d     |\n", logic_block->name,
+      fprintf(g_log_file, "| %-5s (%-5s)   | INPUT  | %d     |\n",
+              logic_block->name, logic_block->prefix ? logic_block->prefix : "",
               input);
 
     } else {
       int input = logic_block->input_streams[i]->logic_data->data;
       printf("LOG (EVALUATION): Input data found (%d).\n", input);
 
-      fprintf(g_log_file, "| %-10s  | INPUT  | %d     |\n", logic_block->name,
+      fprintf(g_log_file, "| %-5s (%-5s)   | INPUT  | %d     |\n",
+              logic_block->name, logic_block->prefix ? logic_block->prefix : "",
               input);
     }
   }
@@ -461,10 +464,11 @@ int logic_console(logic_block_t *logic_block) {
 
   printf("LOG (EVALUATION): Output data found (%d).\n", output);
 
-  fprintf(g_log_file, "| %-10s  | OUTPUT | %d     |\n", logic_block->name,
+  fprintf(g_log_file, "| %-5s (%-5s)   | OUTPUT | %d     |\n",
+          logic_block->name, logic_block->prefix ? logic_block->prefix : "",
           output);
 
-  fprintf(g_log_file, "+-------------+--------+-------+\n");
+  fprintf(g_log_file, "+-----------------+--------+-------+\n");
 
   return 0;
 }
