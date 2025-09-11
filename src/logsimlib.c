@@ -265,7 +265,7 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
       logic_eval_result = 1;
       break;
     case OR:
-      logic_eval_result = 1;
+      logic_eval_result = 0;
       break;
     case XOR:
       logic_eval_result = 0;
@@ -313,8 +313,6 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
         }
 
         case XOR: {
-          printf("LOG: Evaluating XOR...\n");
-
           logic_eval_result =
               logic_eval_result ^
               logic_top_block->logic_block->output_streams[0]->logic_data->data;
@@ -322,7 +320,8 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
         }
 
         case NOT: {
-          logic_eval_result = ~logic_top_block->logic_block->output_streams[0]
+
+          logic_eval_result = !logic_top_block->logic_block->output_streams[0]
                                    ->logic_data->data;
           break;
         }
@@ -371,7 +370,7 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
         }
 
         case NOT: {
-          logic_eval_result = ~logic_top_block->logic_data->data;
+          logic_eval_result = !logic_top_block->logic_data->data;
           break;
         }
         }
