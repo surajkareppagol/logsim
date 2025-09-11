@@ -13,6 +13,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 /*************** C Custom Headers ***************/
 
@@ -22,6 +24,10 @@
 
 #define TRUE 1
 #define FALSE 0
+
+#define DIR_SVG "svg"
+#define DIR_LOG "logs"
+#define BUFFER 1024
 
 /*************** Variables ***************/
 
@@ -44,7 +50,13 @@ void logic_graph_init(char *name) {
 
 void logic_graph_export(char *name) {
   gvLayout(g_graphviz_context, g_graphviz_graph, "dot");
-  gvRenderFilename(g_graphviz_context, g_graphviz_graph, "svg", name);
+
+  char svg_path[1024];
+  snprintf(svg_path, sizeof(svg_path), "%s/%s", DIR_SVG, name);
+
+  mkdir(DIR_SVG, 0755);
+
+  gvRenderFilename(g_graphviz_context, g_graphviz_graph, "svg", svg_path);
 
   gvFreeLayout(g_graphviz_context, g_graphviz_graph);
   agclose(g_graphviz_graph);
@@ -52,7 +64,13 @@ void logic_graph_export(char *name) {
 }
 
 void logic_utility_init(char *name) {
-  g_log_file = fopen(name, "w");
+
+  char log_path[1024];
+  snprintf(log_path, sizeof(log_path), "%s/%s", DIR_LOG, name);
+
+  mkdir(DIR_LOG, 0755);
+
+  g_log_file = fopen(log_path, "w");
 
   fprintf(g_log_file, "+-------------+--------+-------+\n");
   fprintf(g_log_file, "|   BLOCK     | TYPE   | DATA  |\n");
