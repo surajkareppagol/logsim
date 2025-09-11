@@ -205,45 +205,6 @@ int logic_block_block_connect(logic_block_t *logic_block,
   return 0;
 }
 
-int logic_eval_single_block(logic_block_t *logic_block) {
-  if (logic_block == NULL) {
-    return -1;
-  }
-
-  logic_block_type_t logic_block_type = logic_block->logic_block_type;
-
-  int logic_inputs = logic_block->inputs;
-  int logic_output = logic_block->outputs;
-
-  for (int i = 0; i < logic_output; i++) {
-
-    /* Save the initial value */
-    int logic_eval_result = 1;
-
-    for (int j = 0; j < logic_inputs; j++) {
-      switch (logic_block_type) {
-      case AND: {
-        logic_eval_result = logic_eval_result &&
-                            logic_block->input_streams[j]->logic_data->data;
-        break;
-      }
-
-      case OR: {
-        logic_eval_result = logic_eval_result ||
-                            logic_block->input_streams[j]->logic_data->data;
-        break;
-      }
-      }
-    }
-
-    /* Write to output data block */
-    logic_block->output_streams[i]->logic_data->data = logic_eval_result;
-    logic_block->output_streams[i]->logic_data->status = EVALUATED;
-  }
-
-  return 0;
-}
-
 int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
   if (logic_block == NULL) {
     printf("LOG: No data found.\n");
@@ -262,6 +223,16 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
   case OR: {
     node = agnode(g_graphviz_graph, logic_block->name, TRUE);
     agset(node, "label", "OR");
+    break;
+  }
+  case XOR: {
+    node = agnode(g_graphviz_graph, logic_block->name, TRUE);
+    agset(node, "label", "XOR");
+    break;
+  }
+  case NOT: {
+    node = agnode(g_graphviz_graph, logic_block->name, TRUE);
+    agset(node, "label", "NOT");
     break;
   }
   }
@@ -285,7 +256,24 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
   /* Save the initial value */
 
   for (int i = 0; i < logic_output; i++) {
+
     int logic_eval_result = 1;
+
+    /* Set the correct initialization values */
+    switch (logic_block->logic_block_type) {
+    case AND:
+      logic_eval_result = 1;
+      break;
+    case OR:
+      logic_eval_result = 1;
+      break;
+    case XOR:
+      logic_eval_result = 0;
+      break;
+    case NOT:
+      logic_eval_result = 1;
+      break;
+    }
 
     for (int j = 0; j < logic_inputs; j++) {
       logic_top_block_t *logic_top_block = logic_block->input_streams[j];
@@ -312,15 +300,30 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
         switch (logic_block_type) {
         case AND: {
           logic_eval_result =
-              logic_eval_result &&
+              logic_eval_result &
               logic_top_block->logic_block->output_streams[0]->logic_data->data;
           break;
         }
 
         case OR: {
           logic_eval_result =
-              logic_eval_result ||
+              logic_eval_result |
               logic_top_block->logic_block->output_streams[0]->logic_data->data;
+          break;
+        }
+
+        case XOR: {
+          printf("LOG: Evaluating XOR...\n");
+
+          logic_eval_result =
+              logic_eval_result ^
+              logic_top_block->logic_block->output_streams[0]->logic_data->data;
+          break;
+        }
+
+        case NOT: {
+          logic_eval_result = ~logic_top_block->logic_block->output_streams[0]
+                                   ->logic_data->data;
           break;
         }
         }
@@ -348,13 +351,27 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
         switch (logic_block_type) {
         case AND: {
           logic_eval_result =
-              logic_eval_result && logic_top_block->logic_data->data;
+              logic_eval_result & logic_top_block->logic_data->data;
           break;
         }
 
         case OR: {
           logic_eval_result =
-              logic_eval_result || logic_top_block->logic_data->data;
+              logic_eval_result | logic_top_block->logic_data->data;
+          break;
+        }
+
+        case XOR: {
+          printf("LOG: Evaluating XOR for (%d) (%d)...\n", logic_eval_result,
+                 logic_top_block->logic_data->data);
+
+          logic_eval_result =
+              logic_eval_result ^ logic_top_block->logic_data->data;
+          break;
+        }
+
+        case NOT: {
+          logic_eval_result = ~logic_top_block->logic_data->data;
           break;
         }
         }
