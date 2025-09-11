@@ -26,7 +26,7 @@ int main() {
   logic_utility_init("not.log");
 
   /* Create logic block */
-  logic_block_t *lb = logic_block(NOT, 1, 1, "lb");
+  logic_block_t *lb = logic_block(NOT, 1, 1, "lb", NULL);
 
   printf("LOG: Creating input blocks.\n");
 

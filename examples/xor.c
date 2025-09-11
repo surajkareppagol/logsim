@@ -26,7 +26,7 @@ int main() {
   logic_utility_init("xor.log");
 
   /* Create logic block */
-  logic_block_t *lb = logic_block(XOR, 2, 1, "lb");
+  logic_block_t *lb = logic_block(XOR, 2, 1, "lb", NULL);
 
   printf("LOG: Creating input blocks.\n");
 

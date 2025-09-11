@@ -42,12 +42,12 @@ int main() {
   /************************ Create 3 blocks ************************/
   printf("LOG: Creating logic blocks.\n");
 
-  logic_block_t *lb_1 = logic_block(AND, 2, 1, "lb_1");
-  logic_block_t *lb_2 = logic_block(AND, 2, 1, "lb_2");
-  logic_block_t *lb_3 = logic_block(AND, 2, 1, "lb_3");
-  logic_block_t *lb_4 = logic_block(AND, 2, 1, "lb_4");
-  logic_block_t *lb_5 = logic_block(AND, 2, 1, "lb_5");
-  logic_block_t *lb_6 = logic_block(AND, 2, 1, "lb_6");
+  logic_block_t *lb_1 = logic_block(AND, 2, 1, "lb_1", "OUT");
+  logic_block_t *lb_2 = logic_block(AND, 2, 1, "lb_2", NULL);
+  logic_block_t *lb_3 = logic_block(AND, 2, 1, "lb_3", NULL);
+  logic_block_t *lb_4 = logic_block(AND, 2, 1, "lb_4", NULL);
+  logic_block_t *lb_5 = logic_block(AND, 2, 1, "lb_5", NULL);
+  logic_block_t *lb_6 = logic_block(AND, 2, 1, "lb_6", NULL);
 
   /************************ Create 6 input blocks ************************/
 

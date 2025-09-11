@@ -40,8 +40,8 @@ int main() {
   /************************ Create 3 blocks ************************/
   printf("LOG: Creating logic blocks.\n");
 
-  logic_block_t *lb_1 = logic_block(XOR, 2, 1, "lb_1");
-  logic_block_t *lb_2 = logic_block(AND, 2, 1, "lb_2");
+  logic_block_t *lb_1 = logic_block(XOR, 2, 1, "lb_1", "SUM");
+  logic_block_t *lb_2 = logic_block(AND, 2, 1, "lb_2", "CARRY");
 
   /************************ Create 6 input blocks ************************/
 

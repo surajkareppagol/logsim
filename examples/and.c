@@ -26,7 +26,7 @@ int main() {
   logic_utility_init("and.log");
 
   /* Create logic block */
-  logic_block_t *lb = logic_block(0, 2, 1, "lb");
+  logic_block_t *lb = logic_block(AND, 2, 1, "lb", NULL);
 
   printf("LOG: Creating input blocks.\n");
 
