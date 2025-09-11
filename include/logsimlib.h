@@ -49,6 +49,7 @@ typedef struct logic_block {
   logic_block_type_t logic_block_type;
 
   char *name;
+  char *prefix;
   Agnode_t *graph_node;
 
   /* Use these to loop over input and output streams */
@@ -121,10 +122,11 @@ logic_output_block_t *logic_output_block(int logic_blocks);
  * @param inputs
  * @param outputs
  * @param name
+ * @param prefix
  * @return logic_block_t*
  */
 logic_block_t *logic_block(logic_block_type_t logic_block_type, int inputs,
-                           int outputs, char *name);
+                           int outputs, char *name, char *prefix);
 
 /**
  * @brief Create a logic data block.
