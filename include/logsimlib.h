@@ -19,7 +19,7 @@
 
 /*************** Enums ***************/
 
-typedef enum logic_block_type { AND, OR } logic_block_type_t;
+typedef enum logic_block_type { AND, OR, NOT, XOR } logic_block_type_t;
 
 typedef enum logic_data_type { INPUT, OUTPUT } logic_data_type_t;
 
