@@ -2,8 +2,6 @@
  * @file full_adder.c
  * @author Suraj Kareppagol (surajkareppagol.dev@gmail.com)
  * @brief Example for full adder.
- * @version 0.1
- * @date 2025-09-09
  *
  * @copyright Copyright (c) 2025
  *

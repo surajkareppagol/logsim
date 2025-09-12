@@ -2,8 +2,6 @@
  * @file logsim.h
  * @author Suraj Kareppagol (surajkareppagol.dev@gmail.com)
  * @brief LogSim provides a set of functions and macros to simulate logic gates.
- * @version 0.1
- * @date 2025-09-09
  *
  * @copyright Copyright (c) 2025
  *

@@ -2,8 +2,6 @@
  * @file three_level_and.c
  * @author Suraj Kareppagol (surajkareppagol.dev@gmail.com)
  * @brief Example for three level AND gate.
- * @version 0.1
- * @date 2025-09-09
  *
  * @copyright Copyright (c) 2025
  *
