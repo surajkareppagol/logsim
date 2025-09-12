@@ -22,6 +22,12 @@ The whole process can be described in 4 steps.
 
 ## Build
 
+> Note: Make sure to install the graphviz library.
+
+```sh
+sudo apt install libgraphviz-dev
+```
+
 `Makefile` is provided, use the below command to build the examples.
 
 ```sh
