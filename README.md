@@ -2,13 +2,16 @@
 
 `LogSim` is a minimal C library to build and simulate small circuits using logic gates as building blocks.
 
-The library provides two types of building blocks `LOGIC` blocks and `DATA` blocks.
+The library provides two types of building blocks `LOGIC` blocks and `DATA`
+blocks.
 
 The logic blocks are the one such as `AND` and `OR`, data blocks are `INPUT` and `OUTPUT`.
 
 Apart from these additional APIs are provided to connect these different blocks together to build circuits.
 
-Check the `examples` directory for some circuts built using this library. Below is the usage guide, to generate graph calls should be made to `logic_graph_init()` and `logic_graph_export()` APIs.
+Check the `examples` directory for some circuts built using this library. Below
+is the usage guide, to generate graph calls should be made to
+`logic_graph_init()` and `logic_graph_export()` APIs.
 
 The whole process can be described in 4 steps.
 
@@ -100,3 +103,7 @@ Run all the binaries from the `bin` directory at once.
   ```c
   logic_eval_all_output_blocks(lob);
   ```
+
+> Note: Please make calls to `logic_graph_init("and");`,
+> `logic_utility_init("and.log");` and `logic_graph_export("and.svg");` > `logic_utility_terminate();` as for graph and log generation checks are not
+> added.
