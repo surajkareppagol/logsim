@@ -10,6 +10,13 @@ Apart from these additional APIs are provided to connect these different blocks 
 
 Check the `examples` directory for some circuts built using this library. Below is the usage guide, to generate graph calls should be made to `logic_graph_init()` and `logic_graph_export()` APIs.
 
+The whole process can be described in 4 steps.
+
+- Create logic blocks.
+- Create data blocks.
+- Connect all the blocks, either logic-logic or logic-data.
+- Create output block (set of logic blocks with output) and evaluate.
+
 ## Build
 
 `Makefile` is provided, use the below command to build the examples.
@@ -19,6 +26,16 @@ make
 ```
 
 The examples will be available in the `bin` directory.
+
+```sh
+make clean
+```
+
+```sh
+make run
+```
+
+Run all the binaries from the `bin` directory at once.
 
 ## API Usage
 
