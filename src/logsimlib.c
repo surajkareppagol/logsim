@@ -2,8 +2,6 @@
  * @file logsimlib.c
  * @author Suraj Kareppagol (surajkareppagol.dev@gmail.com)
  * @brief LogSim provides a set of functions and macros to simulate logic gates.
- * @version 0.1
- * @date 2025-09-09
  *
  * @copyright Copyright (c) 2025
  *
@@ -19,6 +17,7 @@
 /*************** C Custom Headers ***************/
 
 #include "../include/logsimlib.h"
+#include "../include/utils.h"
 
 /*************** Macros ***************/
 
@@ -35,6 +34,7 @@ GVC_t *g_graphviz_context = NULL;
 Agraph_t *g_graphviz_graph = NULL;
 
 FILE *g_log_file = NULL;
+FILE *g_debug_log_file = NULL;
 
 /*************** Function Definitions ***************/
 
@@ -72,12 +72,22 @@ void logic_utility_init(char *name) {
 
   g_log_file = fopen(log_path, "w");
 
-  fprintf(g_log_file, "+-----------------+--------+-------+\n");
-  fprintf(g_log_file, "|   BLOCK         | TYPE   | DATA  |\n");
-  fprintf(g_log_file, "+-----------------+--------+-------+\n");
+  LOG_SIM_FILE_PRINT(g_log_file, "+-----------------+--------+-------+");
+  LOG_SIM_FILE_PRINT(g_log_file, "|   BLOCK         | TYPE   | DATA  |");
+  LOG_SIM_FILE_PRINT(g_log_file, "+-----------------+--------+-------+");
+
+  /**************************************/
+
+  memset(log_path, 0, sizeof(log_path));
+  snprintf(log_path, sizeof(log_path), "%s/%s", DIR_LOG, "debug.log");
+
+  g_debug_log_file = fopen(log_path, "w");
 }
 
-void logic_utility_terminate() { fclose(g_log_file); }
+void logic_utility_terminate() {
+  fclose(g_log_file);
+  fclose(g_debug_log_file);
+}
 
 logic_output_block_t *logic_output_block(int logic_blocks) {
   logic_output_block_t *logic_output_block = NULL;
@@ -208,7 +218,7 @@ int logic_block_block_connect(logic_block_t *logic_block,
 
 int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
   if (logic_block == NULL) {
-    printf("LOG: No data found.\n");
+    LOG_SIM_DEBUG_PRINT(g_debug_log_file, "No data found.");
     return -1;
   }
 
@@ -238,13 +248,16 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
   }
   }
 
-  printf("LOG: Evaluating logic block (%s).\n", logic_block->name);
+  LOG_SIM_DEBUG_PRINT(g_debug_log_file, "Evaluating logic block (%s).",
+                      logic_block->name);
 
   agset(node, "shape", "rectangle");
 
   if (previous_node != NULL) {
-    printf("LOG: (PREVIOUS NODE: %s) Connecting (%s) -> (%s).\n",
-           agnameof(previous_node), agnameof(node), agnameof(previous_node));
+    LOG_SIM_DEBUG_PRINT(
+        g_debug_log_file, "(Previous Node: %s) Connecting (%s) -> (%s).",
+        agnameof(previous_node), agnameof(node), agnameof(previous_node));
+
     agedge(g_graphviz_graph, node, previous_node, NULL, TRUE);
   }
 
@@ -362,9 +375,6 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
         }
 
         case XOR: {
-          printf("LOG: Evaluating XOR for (%d) (%d)...\n", logic_eval_result,
-                 logic_top_block->logic_data->data);
-
           logic_eval_result =
               logic_eval_result ^ logic_top_block->logic_data->data;
           break;
@@ -399,7 +409,8 @@ int logic_eval_all_output_blocks(logic_output_block_t *logic_output_block) {
   }
 
   for (int i = 0; i < logic_output_block->total_blocks; i++) {
-    printf("LOG: Current block (%d).\n", i);
+    LOG_SIM_DEBUG_PRINT(g_debug_log_file, "Current block (%d).", i);
+
     logic_eval_all(logic_output_block->logic_blocks[i], NULL);
   }
 
@@ -424,17 +435,20 @@ int logic_eval_all_output_blocks(logic_output_block_t *logic_output_block) {
 
 int logic_console(logic_block_t *logic_block) {
   if (logic_block == NULL) {
-    printf("LOG: No data found.\n");
+    LOG_SIM_DEBUG_PRINT(g_debug_log_file, "No data found.");
+
     return -1;
   }
 
   int logic_inputs = logic_block->inputs;
 
-  printf("----------\n"
-         "| LOGSIM |\n"
-         "----------\n\n");
+  LOG_SIM_LOG_PRINT("----------\n"
+                    "| LOGSIM |\n"
+                    "----------\n");
 
-  printf("LOG (EVALUATION): LOGICAL BLOCK (%s).\n", logic_block->name);
+  LOG_SIM_LOG_PRINT("Result for logic block (%s)\n"
+                    "---------------------------",
+                    logic_block->name);
 
 #if 1
   for (int i = 0; i < logic_inputs; i++) {
@@ -443,32 +457,32 @@ int logic_console(logic_block_t *logic_block) {
                       ->logic_block->output_streams[0]
                       ->logic_data->data;
 
-      printf("LOG (EVALUATION): Input data found (%d).\n", input);
+      LOG_SIM_LOG_PRINT("INPUT Found (%d).", input);
 
-      fprintf(g_log_file, "| %-5s (%-5s)   | INPUT  | %d     |\n",
-              logic_block->name, logic_block->prefix ? logic_block->prefix : "",
-              input);
+      LOG_SIM_FILE_PRINT(g_log_file, "| %-5s (%-5s)   | INPUT  | %d     |",
+                         logic_block->name,
+                         logic_block->prefix ? logic_block->prefix : "", input);
 
     } else {
       int input = logic_block->input_streams[i]->logic_data->data;
-      printf("LOG (EVALUATION): Input data found (%d).\n", input);
+      LOG_SIM_LOG_PRINT("INPUT Found (%d).", input);
 
-      fprintf(g_log_file, "| %-5s (%-5s)   | INPUT  | %d     |\n",
-              logic_block->name, logic_block->prefix ? logic_block->prefix : "",
-              input);
+      LOG_SIM_FILE_PRINT(g_log_file, "| %-5s (%-5s)   | INPUT  | %d     |",
+                         logic_block->name,
+                         logic_block->prefix ? logic_block->prefix : "", input);
     }
   }
 #endif
 
   int output = logic_block->output_streams[0]->logic_data->data;
 
-  printf("LOG (EVALUATION): Output data found (%d).\n", output);
+  LOG_SIM_LOG_PRINT("OUTPUT data found (%d).", output);
 
-  fprintf(g_log_file, "| %-5s (%-5s)   | OUTPUT | %d     |\n",
-          logic_block->name, logic_block->prefix ? logic_block->prefix : "",
-          output);
+  LOG_SIM_FILE_PRINT(g_log_file, "| %-5s (%-5s)   | OUTPUT | %d     |",
+                     logic_block->name,
+                     logic_block->prefix ? logic_block->prefix : "", output);
 
-  fprintf(g_log_file, "+-----------------+--------+-------+\n");
+  LOG_SIM_FILE_PRINT(g_log_file, "+-----------------+--------+-------+");
 
   return 0;
 }
