@@ -38,6 +38,16 @@ $(BUILD_DIR):
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
+.PHONY: run
+run: all
+	@for bin in $(EXAMPLE_BINS); do \
+		name=$$(basename $$bin); \
+		echo "========== $$name =========="; \
+		echo; \
+		./$$bin; \
+		echo; \
+	done
+
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)/*.o $(BIN_DIR)/*
