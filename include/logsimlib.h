@@ -48,12 +48,13 @@ void logic_utility_init(char *name);
 void logic_utility_terminate();
 
 /**
- * @brief Create logic output block.
+ * @brief Create a top level logic block.
  *
- * @param logic_blocks
- * @return logic_output_block_t*
+ * @param logic_top_block_type
+ * @return logic_top_block_t*
  */
-logic_output_block_t *logic_output_block(int logic_blocks);
+logic_top_block_t *
+logic_create_top_block(logic_top_block_type_t logic_top_block_type);
 
 /**
  * @brief Create a logic block.
@@ -65,8 +66,9 @@ logic_output_block_t *logic_output_block(int logic_blocks);
  * @param prefix
  * @return logic_block_t*
  */
-logic_block_t *logic_block(logic_block_type_t logic_block_type, int inputs,
-                           int outputs, char *name, char *prefix);
+logic_block_t *logic_create_logic_block(logic_block_type_t logic_block_type,
+                                        int inputs, int outputs, char *name,
+                                        char *prefix);
 
 /**
  * @brief Create a logic data block.
@@ -75,15 +77,8 @@ logic_block_t *logic_block(logic_block_type_t logic_block_type, int inputs,
  * @param data
  * @return logic_data_t*
  */
-logic_data_t *logic_data(logic_data_type_t logic_data_type, int data);
-
-/**
- * @brief Create a top level logic block.
- *
- * @param logic_top_block_type
- * @return logic_top_block_t*
- */
-logic_top_block_t *logic_top_block(logic_top_block_type_t logic_top_block_type);
+logic_data_t *logic_create_data_block(logic_data_type_t logic_data_type,
+                                      int data);
 
 /**
  * @brief Connect a logical block with data block.
@@ -131,15 +126,8 @@ int logic_get_initalization_value(logic_block_type_t type);
  * @param previous_node
  * @return int
  */
-int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node);
-
-/**
- * @brief Evaluate all the connected blocks from the output block.
- *
- * @param logic_output_block
- * @return int
- */
-int logic_eval_all_output_blocks(logic_output_block_t *logic_output_block);
+int logic_evaluate_single_block(logic_block_t *logic_block,
+                                Agnode_t *previous_node);
 
 /**
  * @brief Evaluate all the output blocks.

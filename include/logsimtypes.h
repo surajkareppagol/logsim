@@ -84,13 +84,6 @@ typedef struct logic_top_block {
 
 } logic_top_block_t;
 
-/* For multi output circuits */
-typedef struct logic_output_block {
-  logic_block_t **logic_blocks;
-  int total_blocks;
-
-} logic_output_block_t;
-
 #endif
 
 /************************************************/

@@ -81,21 +81,25 @@ void logic_utility_terminate() {
   fclose(g_debug_log_file);
 }
 
-logic_output_block_t *logic_output_block(int logic_blocks) {
-  logic_output_block_t *logic_output_block = NULL;
+/**************************************/
 
-  logic_output_block = calloc(1, sizeof(logic_output_block_t));
+logic_top_block_t *
+logic_create_top_block(logic_top_block_type_t logic_top_block_type) {
+  logic_top_block_t *logic_top_block = NULL;
 
-  logic_output_block->total_blocks = logic_blocks;
+  logic_top_block = calloc(1, sizeof(logic_top_block_t));
 
-  logic_output_block->logic_blocks =
-      calloc(logic_blocks, sizeof(logic_block_t *));
+  logic_top_block->logic_top_block_type = logic_top_block_type;
 
-  return logic_output_block;
+  logic_top_block->logic_block = NULL;
+  logic_top_block->logic_data = NULL;
+
+  return logic_top_block;
 }
 
-logic_block_t *logic_block(logic_block_type_t logic_block_type, int inputs,
-                           int outputs, char *name, char *prefix) {
+logic_block_t *logic_create_logic_block(logic_block_type_t logic_block_type,
+                                        int inputs, int outputs, char *name,
+                                        char *prefix) {
   logic_block_t *logic_block = NULL;
 
   logic_block = calloc(1, sizeof(logic_block_t));
@@ -112,11 +116,11 @@ logic_block_t *logic_block(logic_block_type_t logic_block_type, int inputs,
 
   /* Create all the top level blocks */
   for (int i = 0; i < inputs; i++) {
-    logic_block->input_streams[i] = logic_top_block(NONE);
+    logic_block->input_streams[i] = logic_create_top_block(NONE);
   }
 
   for (int i = 0; i < outputs; i++) {
-    logic_block->output_streams[i] = logic_top_block(NONE);
+    logic_block->output_streams[i] = logic_create_top_block(NONE);
   }
 
   logic_block->current_input = 0;
@@ -125,7 +129,8 @@ logic_block_t *logic_block(logic_block_type_t logic_block_type, int inputs,
   return logic_block;
 }
 
-logic_data_t *logic_data(logic_data_type_t logic_data_type, int data) {
+logic_data_t *logic_create_data_block(logic_data_type_t logic_data_type,
+                                      int data) {
   logic_data_t *logic_data = NULL;
 
   logic_data = calloc(1, sizeof(logic_data_t));
@@ -136,20 +141,6 @@ logic_data_t *logic_data(logic_data_type_t logic_data_type, int data) {
   logic_data->status = NOT_EVALUATED;
 
   return logic_data;
-}
-
-logic_top_block_t *
-logic_top_block(logic_top_block_type_t logic_top_block_type) {
-  logic_top_block_t *logic_top_block = NULL;
-
-  logic_top_block = calloc(1, sizeof(logic_top_block_t));
-
-  logic_top_block->logic_top_block_type = logic_top_block_type;
-
-  logic_top_block->logic_block = NULL;
-  logic_top_block->logic_data = NULL;
-
-  return logic_top_block;
 }
 
 int logic_block_data_connect(logic_block_t *logic_block,
@@ -246,7 +237,8 @@ int logic_get_initalization_value(logic_block_type_t type) {
   return 0;
 }
 
-int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
+int logic_evaluate_single_block(logic_block_t *logic_block,
+                                Agnode_t *previous_node) {
   if (logic_block == NULL) {
     LOG_SIM_DEBUG_PRINT(g_debug_log_file, "No data found.");
     return -1;
@@ -287,7 +279,7 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
       case LOGIC_BLOCK: {
         if (logic_top_block->logic_block->output_streams[0]
                 ->logic_data->status == NOT_EVALUATED) {
-          logic_eval_all(logic_top_block->logic_block, node);
+          logic_evaluate_single_block(logic_top_block->logic_block, node);
         } else {
 
           agedge(g_graphviz_graph, logic_top_block->logic_block->graph_node,
@@ -347,7 +339,7 @@ int logic_evaluate(int total_logic_blocks, ...) {
   for (int i = 0; i < total_logic_blocks; i++) {
     logic_block_t *logic_block = va_arg(logic_blocks, logic_block_t *);
 
-    logic_eval_all(logic_block, NULL);
+    logic_evaluate_single_block(logic_block, NULL);
 
     util_attach_invisible_edge(logic_block->name, i, logic_block->graph_node,
                                true);
@@ -375,7 +367,6 @@ int logic_console(logic_block_t *logic_block) {
                     "---------------------------",
                     logic_block->name);
 
-#if 1
   for (int i = 0; i < logic_inputs; i++) {
     if (logic_block->input_streams[i]->logic_top_block_type == LOGIC_BLOCK) {
       int input = logic_block->input_streams[i]
@@ -397,7 +388,6 @@ int logic_console(logic_block_t *logic_block) {
                          logic_block->prefix ? logic_block->prefix : "", input);
     }
   }
-#endif
 
   int output = logic_block->output_streams[0]->logic_data->data;
 
