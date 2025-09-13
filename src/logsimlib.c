@@ -309,7 +309,7 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
       case DATA_BLOCK: {
         /* Create unique name for data node */
         util_attach_invisible_edge(logic_block->name, j,
-                                   logic_block->graph_node);
+                                   logic_block->graph_node, false);
 
         /* Get the top logic block */
         logic_block_type_t logic_block_type = logic_block->logic_block_type;
@@ -349,7 +349,8 @@ int logic_evaluate(int total_logic_blocks, ...) {
 
     logic_eval_all(logic_block, NULL);
 
-    util_attach_invisible_edge(logic_block->name, i, logic_block->graph_node);
+    util_attach_invisible_edge(logic_block->name, i, logic_block->graph_node,
+                               true);
   }
 
   va_end(logic_blocks);
