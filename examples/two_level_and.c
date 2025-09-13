@@ -89,11 +89,7 @@ int main() {
 
   /************************ Evaluate ************************/
 
-  logic_output_block_t *lob = logic_output_block(1);
-
-  lob->logic_blocks[0] = lb_1;
-
-  logic_eval_all_output_blocks(lob);
+  logic_evaluate(1, lb_1);
 
   logic_graph_export("two_level_and.svg");
   logic_utility_terminate();
