@@ -75,9 +75,11 @@ Agnode_t *util_create_edge(char *label, logic_block_type_t type);
  * @param label
  * @param block_index
  * @param node
+ * @param reverse
  * @return int
  */
-int util_attach_invisible_edge(char *label, int block_index, Agnode_t *node);
+int util_attach_invisible_edge(char *label, int block_index, Agnode_t *node,
+                               bool reverse);
 
 #endif
 
