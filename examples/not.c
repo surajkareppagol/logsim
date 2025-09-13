@@ -24,16 +24,16 @@ int main() {
   logic_utility_init("not.log");
 
   /* Create logic block */
-  logic_block_t *lb = logic_block(NOT, 1, 1, "lb", NULL);
+  logic_block_t *lb = logic_create_logic_block(NOT, 1, 1, "lb", NULL);
 
   printf("LOG: Creating input blocks.\n");
 
   /* Create data block */
-  logic_data_t *input_a = logic_data(INPUT, 0);
+  logic_data_t *input_a = logic_create_data_block(INPUT, 0);
 
   printf("LOG: Creating output blocks.\n");
 
-  logic_data_t *output = logic_data(OUTPUT, 0);
+  logic_data_t *output = logic_create_data_block(OUTPUT, 0);
 
   printf("LOG: Connecting input blocks.\n");
 

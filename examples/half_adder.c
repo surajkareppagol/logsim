@@ -38,23 +38,23 @@ int main() {
   /************************ Create 3 blocks ************************/
   printf("LOG: Creating logic blocks.\n");
 
-  logic_block_t *lb_1 = logic_block(XOR, 2, 1, "lb_1", "SUM");
-  logic_block_t *lb_2 = logic_block(AND, 2, 1, "lb_2", "CARRY");
+  logic_block_t *lb_1 = logic_create_logic_block(XOR, 2, 1, "lb_1", "SUM");
+  logic_block_t *lb_2 = logic_create_logic_block(AND, 2, 1, "lb_2", "CARRY");
 
   /************************ Create 6 input blocks ************************/
 
   printf("LOG: Creating data blocks.\n");
 
-  logic_data_t *lb_i_1_1 = logic_data(INPUT, 1);
-  logic_data_t *lb_i_1_2 = logic_data(INPUT, 1);
+  logic_data_t *lb_i_1_1 = logic_create_data_block(INPUT, 1);
+  logic_data_t *lb_i_1_2 = logic_create_data_block(INPUT, 1);
 
-  logic_data_t *lb_i_2_1 = logic_data(INPUT, 1);
-  logic_data_t *lb_i_2_2 = logic_data(INPUT, 1);
+  logic_data_t *lb_i_2_1 = logic_create_data_block(INPUT, 1);
+  logic_data_t *lb_i_2_2 = logic_create_data_block(INPUT, 1);
 
   /************************ Create 3 output blocks ************************/
 
-  logic_data_t *lb_o_1_1 = logic_data(OUTPUT, 0);
-  logic_data_t *lb_o_2_1 = logic_data(OUTPUT, 0);
+  logic_data_t *lb_o_1_1 = logic_create_data_block(OUTPUT, 0);
+  logic_data_t *lb_o_2_1 = logic_create_data_block(OUTPUT, 0);
 
   /************************ Connect block 1 ************************/
 

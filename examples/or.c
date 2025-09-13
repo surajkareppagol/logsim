@@ -24,17 +24,17 @@ int main() {
   logic_utility_init("or.log");
 
   /* Create logic block */
-  logic_block_t *lb = logic_block(OR, 2, 1, "lb", NULL);
+  logic_block_t *lb = logic_create_logic_block(OR, 2, 1, "lb", NULL);
 
   printf("LOG: Creating input blocks.\n");
 
   /* Create data block */
-  logic_data_t *input_a = logic_data(INPUT, 1);
-  logic_data_t *input_b = logic_data(INPUT, 1);
+  logic_data_t *input_a = logic_create_data_block(INPUT, 1);
+  logic_data_t *input_b = logic_create_data_block(INPUT, 1);
 
   printf("LOG: Creating output blocks.\n");
 
-  logic_data_t *output = logic_data(OUTPUT, 0);
+  logic_data_t *output = logic_create_data_block(OUTPUT, 0);
 
   printf("LOG: Connecting input blocks.\n");
 
