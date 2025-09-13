@@ -142,6 +142,15 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node);
 int logic_eval_all_output_blocks(logic_output_block_t *logic_output_block);
 
 /**
+ * @brief Evaluate all the output blocks.
+ *
+ * @param total_logic_blocks
+ * @param ...
+ * @return int
+ */
+int logic_evaluate(int total_logic_blocks, ...);
+
+/**
  * @brief Print the data field to console.
  *
  * @param logic_data

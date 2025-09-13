@@ -9,6 +9,7 @@
 
 /*************** C Standard Headers ***************/
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -337,20 +338,21 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
   return 0;
 }
 
-int logic_eval_all_output_blocks(logic_output_block_t *logic_output_block) {
-  if (logic_output_block == NULL) {
-    return -1;
+int logic_evaluate(int total_logic_blocks, ...) {
+
+  va_list logic_blocks;
+
+  va_start(logic_blocks, total_logic_blocks);
+
+  for (int i = 0; i < total_logic_blocks; i++) {
+    logic_block_t *logic_block = va_arg(logic_blocks, logic_block_t *);
+
+    logic_eval_all(logic_block, NULL);
+
+    util_attach_invisible_edge(logic_block->name, i, logic_block->graph_node);
   }
 
-  for (int i = 0; i < logic_output_block->total_blocks; i++) {
-    logic_eval_all(logic_output_block->logic_blocks[i], NULL);
-  }
-
-  /* Add output invible nodes */
-  for (int i = 0; i < logic_output_block->total_blocks; i++) {
-    util_attach_invisible_edge(logic_output_block->logic_blocks[i]->name, i,
-                               logic_output_block->logic_blocks[i]->graph_node);
-  }
+  va_end(logic_blocks);
 
   return 0;
 }
