@@ -19,15 +19,6 @@
 #include "../include/logsimlib.h"
 #include "../include/utils.h"
 
-/*************** Macros ***************/
-
-#define TRUE 1
-#define FALSE 0
-
-#define DIR_SVG "svg"
-#define DIR_LOG "logs"
-#define BUFFER 1024
-
 /*************** Variables ***************/
 
 GVC_t *g_graphviz_context = NULL;
@@ -216,43 +207,58 @@ int logic_block_block_connect(logic_block_t *logic_block,
   return 0;
 }
 
+int logic_process_data(logic_block_type_t logic_block_type, int input_a,
+                       int input_b) {
+  switch (logic_block_type) {
+  case AND: {
+    return input_a & input_b;
+  }
+
+  case OR: {
+    return input_a | input_b;
+  }
+
+  case XOR: {
+    return input_a ^ input_b;
+  }
+
+  case NOT: {
+    return !input_b;
+  }
+  }
+
+  return 0;
+}
+
+int logic_get_initalization_value(logic_block_type_t type) {
+  switch (type) {
+  case AND:
+    return 1;
+  case OR:
+    return 0;
+  case XOR:
+    return 0;
+  case NOT:
+    return 1;
+  }
+
+  return 0;
+}
+
 int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
   if (logic_block == NULL) {
     LOG_SIM_DEBUG_PRINT(g_debug_log_file, "No data found.");
     return -1;
   }
 
-  /* Create graph node */
-
-  Agnode_t *node = agnode(g_graphviz_graph, logic_block->name, TRUE);
-
-  switch (logic_block->logic_block_type) {
-  case AND: {
-    agset(node, "label", "AND");
-    break;
-  }
-  case OR: {
-    node = agnode(g_graphviz_graph, logic_block->name, TRUE);
-    agset(node, "label", "OR");
-    break;
-  }
-  case XOR: {
-    node = agnode(g_graphviz_graph, logic_block->name, TRUE);
-    agset(node, "label", "XOR");
-    break;
-  }
-  case NOT: {
-    node = agnode(g_graphviz_graph, logic_block->name, TRUE);
-    agset(node, "label", "NOT");
-    break;
-  }
-  }
-
   LOG_SIM_DEBUG_PRINT(g_debug_log_file, "Evaluating logic block (%s).",
                       logic_block->name);
 
-  agset(node, "shape", "rectangle");
+  /* Create graph node */
+  Agnode_t *node =
+      util_create_edge(logic_block->name, logic_block->logic_block_type);
 
+  /* Add an edge from node to previous_node */
   if (previous_node != NULL) {
     LOG_SIM_DEBUG_PRINT(
         g_debug_log_file, "(Previous Node: %s) Connecting (%s) -> (%s).",
@@ -267,27 +273,10 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
   int logic_inputs = logic_block->inputs;
   int logic_output = logic_block->outputs;
 
-  /* Save the initial value */
-
   for (int i = 0; i < logic_output; i++) {
-
-    int logic_eval_result = 1;
-
-    /* Set the correct initialization values */
-    switch (logic_block->logic_block_type) {
-    case AND:
-      logic_eval_result = 1;
-      break;
-    case OR:
-      logic_eval_result = 0;
-      break;
-    case XOR:
-      logic_eval_result = 0;
-      break;
-    case NOT:
-      logic_eval_result = 1;
-      break;
-    }
+    /* Evaluation result */
+    int logic_eval_result =
+        logic_get_initalization_value(logic_block->logic_block_type);
 
     for (int j = 0; j < logic_inputs; j++) {
       logic_top_block_t *logic_top_block = logic_block->input_streams[j];
@@ -299,11 +288,7 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
                 ->logic_data->status == NOT_EVALUATED) {
           logic_eval_all(logic_top_block->logic_block, node);
         } else {
-#if 0
-          printf("LOG: (PREVIOUS NODE: %s) Connecting (%s) -> (%s).\n",
-                 agnameof(previous_node), agnameof(node),
-                 agnameof(previous_node));
-#endif
+
           agedge(g_graphviz_graph, logic_top_block->logic_block->graph_node,
                  node, NULL, TRUE);
         }
@@ -311,80 +296,29 @@ int logic_eval_all(logic_block_t *logic_block, Agnode_t *previous_node) {
         /* Use the data from the result */
         logic_block_type_t logic_block_type = logic_block->logic_block_type;
 
-        switch (logic_block_type) {
-        case AND: {
-          logic_eval_result =
-              logic_eval_result &
-              logic_top_block->logic_block->output_streams[0]->logic_data->data;
-          break;
-        }
+        int input_a = logic_eval_result;
+        int input_b =
+            logic_top_block->logic_block->output_streams[0]->logic_data->data;
 
-        case OR: {
-          logic_eval_result =
-              logic_eval_result |
-              logic_top_block->logic_block->output_streams[0]->logic_data->data;
-          break;
-        }
-
-        case XOR: {
-          logic_eval_result =
-              logic_eval_result ^
-              logic_top_block->logic_block->output_streams[0]->logic_data->data;
-          break;
-        }
-
-        case NOT: {
-
-          logic_eval_result = !logic_top_block->logic_block->output_streams[0]
-                                   ->logic_data->data;
-          break;
-        }
-        }
+        logic_eval_result =
+            logic_process_data(logic_block_type, input_a, input_b);
 
         break;
       }
       case DATA_BLOCK: {
-
         /* Create unique name for data node */
-        char data_node_name[1024];
-
-        snprintf(data_node_name, sizeof(data_node_name), "%s_%d",
-                 logic_block->name, j);
-
-        Agnode_t *invisible_input_node =
-            agnode(g_graphviz_graph, data_node_name, 1);
-
-        agsafeset(invisible_input_node, "style", "invis", "");
-        agedge(g_graphviz_graph, invisible_input_node, logic_block->graph_node,
-               NULL, 1);
+        util_attach_invisible_edge(logic_block->name, j,
+                                   logic_block->graph_node);
 
         /* Get the top logic block */
         logic_block_type_t logic_block_type = logic_block->logic_block_type;
 
-        switch (logic_block_type) {
-        case AND: {
-          logic_eval_result =
-              logic_eval_result & logic_top_block->logic_data->data;
-          break;
-        }
+        int input_a = logic_eval_result;
+        int input_b = logic_top_block->logic_data->data;
 
-        case OR: {
-          logic_eval_result =
-              logic_eval_result | logic_top_block->logic_data->data;
-          break;
-        }
+        logic_eval_result =
+            logic_process_data(logic_block_type, input_a, input_b);
 
-        case XOR: {
-          logic_eval_result =
-              logic_eval_result ^ logic_top_block->logic_data->data;
-          break;
-        }
-
-        case NOT: {
-          logic_eval_result = !logic_top_block->logic_data->data;
-          break;
-        }
-        }
         break;
       }
       case NONE: {
@@ -409,25 +343,13 @@ int logic_eval_all_output_blocks(logic_output_block_t *logic_output_block) {
   }
 
   for (int i = 0; i < logic_output_block->total_blocks; i++) {
-    LOG_SIM_DEBUG_PRINT(g_debug_log_file, "Current block (%d).", i);
-
     logic_eval_all(logic_output_block->logic_blocks[i], NULL);
   }
 
+  /* Add output invible nodes */
   for (int i = 0; i < logic_output_block->total_blocks; i++) {
-
-    /* Create unique name for data node */
-    char data_node_name[1024];
-
-    snprintf(data_node_name, sizeof(data_node_name), "output_%s_%d",
-             logic_output_block->logic_blocks[i]->name, i);
-
-    Agnode_t *invisible_output_node =
-        agnode(g_graphviz_graph, data_node_name, 1);
-
-    agsafeset(invisible_output_node, "style", "invis", "");
-    agedge(g_graphviz_graph, logic_output_block->logic_blocks[i]->graph_node,
-           invisible_output_node, NULL, 1);
+    util_attach_invisible_edge(logic_output_block->logic_blocks[i]->name, i,
+                               logic_output_block->logic_blocks[i]->graph_node);
   }
 
   return 0;
