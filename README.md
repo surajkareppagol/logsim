@@ -48,6 +48,17 @@ Run all the binaries from the `bin` directory at once.
 
 ## API Usage
 
+```txt
+---|===|
+   | 2 |-----|
+---|===|     |
+             |---|===|
+                 | 1 |---
+---|===|     |---|===|
+   | 3 |-----|
+---|===|
+```
+
 - Include the header `logsimlib.h`.
 
   ```c
@@ -57,34 +68,32 @@ Run all the binaries from the `bin` directory at once.
 - Create the logic blocks.
 
   ```c
-  logic_block_t *lb_1 = logic_block(AND, 2, 1, "lb_1");
-  ```
-
-  ```c
-  logic_block_t *lb_2 = logic_block(AND, 2, 1, "lb_2");
+  logic_block_t *lb_1 = logic_create_logic_block(AND, 2, 1, "lb_1", "OUT");
+  logic_block_t *lb_2 = logic_create_logic_block(AND, 2, 1, "lb_2", NULL);
+  logic_block_t *lb_3 = logic_create_logic_block(AND, 2, 1, "lb_3", NULL);
   ```
 
 - Create the data blocks.
 
   ```c
-  logic_data_t *lb_i_1_1 = logic_data(INPUT, 1);
-  logic_data_t *lb_i_1_2 = logic_data(INPUT, 1);
+  logic_data_t *lb_i_2_1 = logic_create_data_block(INPUT, 1);
+  logic_data_t *lb_i_2_2 = logic_create_data_block(INPUT, 1);
 
-  logic_data_t *lb_o_1_1 = logic_data(OUTPUT, 1);
+  logic_data_t *lb_i_3_1 = logic_create_data_block(INPUT, 0);
+  logic_data_t *lb_i_3_2 = logic_create_data_block(INPUT, 1);
   ```
 
   ```c
-  logic_data_t *lb_i_2_1 = logic_data(INPUT, 1);
-  logic_data_t *lb_i_2_2 = logic_data(INPUT, 1);
-
-  logic_data_t *lb_o_2_1 = logic_data(OUTPUT, 1);
+  logic_data_t *lb_o_1_1 = logic_create_data_block(OUTPUT, 0);
+  logic_data_t *lb_o_2_1 = logic_create_data_block(OUTPUT, 0);
+  logic_data_t *lb_o_3_1 = logic_create_data_block(OUTPUT, 0);
   ```
 
 - Connect the blocks, either _Data-Block_ or _Block-Block_.
 
   ```c
-  logic_block_data_connect(lb_1, lb_i_1_1);
-  logic_block_data_connect(lb_1, lb_i_1_2);
+  logic_block_block_connect(lb_1, lb_2);
+  logic_block_block_connect(lb_1, lb_3);
 
   logic_block_data_connect(lb_1, lb_o_1_1);
   ```
@@ -96,18 +105,17 @@ Run all the binaries from the `bin` directory at once.
   logic_block_data_connect(lb_2, lb_o_2_1);
   ```
 
-- Once connected add the output blocks to top blocks array.
-
   ```c
-  logic_output_block_t *lob = logic_output_block(1);
+  logic_block_data_connect(lb_3, lb_i_3_1);
+  logic_block_data_connect(lb_3, lb_i_3_2);
 
-  lob->logic_blocks[0] = lb_1;
+  logic_block_data_connect(lb_3, lb_o_3_1);
   ```
 
-- Use the evaluation function to evaluate all the gates.
+- Use the evaluate function and pass the output gates as arguments.
 
   ```c
-  logic_eval_all_output_blocks(lob);
+  logic_evaluate(1, lb_1);
   ```
 
 > Note: Please make calls to `logic_graph_init("and");`,
