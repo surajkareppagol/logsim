@@ -12,13 +12,12 @@
 
 /*************** C Standard Headers ***************/
 
+#include <stdbool.h>
+
 #include <graphviz/cgraph.h>
 #include <graphviz/gvc.h>
 
 /*************** Macros ***************/
-
-#define TRUE 1
-#define FALSE 0
 
 #define DIR_SVG "svg"
 #define DIR_LOG "logs"

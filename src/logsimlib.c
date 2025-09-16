@@ -257,7 +257,7 @@ int logic_evaluate_single_block(logic_block_t *logic_block,
         g_debug_log_file, "(Previous Node: %s) Connecting (%s) -> (%s).",
         agnameof(previous_node), agnameof(node), agnameof(previous_node));
 
-    agedge(g_graphviz_graph, node, previous_node, NULL, TRUE);
+    agedge(g_graphviz_graph, node, previous_node, NULL, true);
   }
 
   logic_block->graph_node = node;
@@ -283,7 +283,7 @@ int logic_evaluate_single_block(logic_block_t *logic_block,
         } else {
 
           agedge(g_graphviz_graph, logic_top_block->logic_block->graph_node,
-                 node, NULL, TRUE);
+                 node, NULL, true);
         }
 
         /* Use the data from the result */

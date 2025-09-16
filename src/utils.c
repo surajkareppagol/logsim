@@ -15,7 +15,7 @@
 /*************** Function Definitions ***************/
 
 Agnode_t *util_create_edge(char *label, logic_block_type_t type) {
-  Agnode_t *node = agnode(g_graphviz_graph, label, TRUE);
+  Agnode_t *node = agnode(g_graphviz_graph, label, true);
 
   switch (type) {
   case AND: {
